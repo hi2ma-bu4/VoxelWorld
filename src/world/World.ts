@@ -144,7 +144,7 @@ export class World {
 	}
 
 	private getPlayerChunkPosition(): [number, number] {
-		const pos = this.player.controls.getObject().position;
+		const pos = this.player.controls.object.position;
 		const cx = Math.floor(pos.x / CHUNK_SIZE_X);
 		const cz = Math.floor(pos.z / CHUNK_SIZE_Z);
 		return [cx, cz];
@@ -161,7 +161,7 @@ export class World {
 		}
 
 		// カメラ（視点）からレイを飛ばす
-		this.raycaster.setFromCamera({ x: 0, y: 0 }, this.renderer.camera); // 画面中央
+		this.raycaster.setFromCamera(new THREE.Vector2(0, 0), this.renderer.camera); // 画面中央
 		const intersects = this.raycaster.intersectObjects(Array.from(this.chunks.values()), false);
 
 		if (intersects.length > 0) {

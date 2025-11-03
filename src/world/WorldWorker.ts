@@ -73,12 +73,17 @@ async function generateAndSendMesh(cx: number, cy: number, cz: number) {
 		chunkKey: key,
 		mesh: mesh,
 	};
-	self.postMessage(response, [
-		mesh.positions,
-		mesh.normals,
-		mesh.uvs, // UVs追加
-		mesh.indices,
-	]);
+	self.postMessage(
+		response,
+		{
+			transfer: [
+				mesh.positions,
+				mesh.normals,
+				mesh.uvs, // UVs追加
+				mesh.indices,
+			],
+		}
+	);
 }
 
 // ブロックを設置/破壊

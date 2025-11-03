@@ -4,7 +4,6 @@ import { PointerLockControls } from "three/examples/jsm/controls/PointerLockCont
 
 export class Player {
 	public controls: PointerLockControls;
-	private camera: THREE.Camera;
 
 	// 移動関連
 	private velocity = new THREE.Vector3();
@@ -13,12 +12,11 @@ export class Player {
 	private moveBackward = false;
 	private moveLeft = false;
 	private moveRight = false;
-	private canJump = false; // TODO: ジャンプ (フェーズ2)
+	// private canJump = false; // TODO: ジャンプ (フェーズ2)
 
 	private prevTime: number;
 
 	constructor(camera: THREE.Camera, domElement: HTMLElement) {
-		this.camera = camera;
 		this.controls = new PointerLockControls(camera, domElement);
 		this.prevTime = performance.now();
 

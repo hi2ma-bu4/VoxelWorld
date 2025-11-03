@@ -15,7 +15,7 @@ export class IndexedDBManager {
 
 			const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-			request.onerror = (event) => {
+			request.onerror = () => {
 				console.error("IndexedDB error:", request.error);
 				reject(new Error("Failed to open DB"));
 			};
