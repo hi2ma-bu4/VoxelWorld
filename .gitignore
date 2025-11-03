@@ -1,3 +1,8 @@
 **/node_modules/**
 
 src-rust/target/**
+
+# Build output
+dist/
+dev.log
+src/rust-pkg/
