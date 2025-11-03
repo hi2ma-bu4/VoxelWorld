@@ -1,5 +1,5 @@
-import { execSync } from "child_process";
-import { rmSync } from "fs";
+import { execSync } from "node:child_process";
+import { rmSync } from "node:fs";
 
 const RUST_SRC_DIR = "src-rust";
 const RUST_OUT_DIR = "src/rust-pkg";
@@ -10,10 +10,8 @@ try {
 	console.log("Old Rust build cleaned up.");
 
 	console.log("Building Rust (WebAssembly)...");
-	execSync(
-		`npx wasm-pack build --target web --out-dir ../${RUST_OUT_DIR}`,
-		{ stdio: "inherit", cwd: RUST_SRC_DIR }
-	);
+	execSync(`wasm-pack build --no-pack --target web --out-dir ../${RUST_OUT_DIR}`, { stdio: "inherit", cwd: RUST_SRC_DIR });
+	rmSync(`${RUST_OUT_DIR}/.gitignore`, { force: true });
 	console.log("Rust build complete.");
 
 	console.log("Building TypeScript...");

@@ -1,13 +1,12 @@
-import * as THREE from "three";
-// PointerLockControls は three/examples からインポートする必要がある
+import { Camera, Vector3 } from "three";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
 
 export class Player {
 	public controls: PointerLockControls;
 
 	// 移動関連
-	private velocity = new THREE.Vector3();
-	private direction = new THREE.Vector3();
+	private velocity = new Vector3();
+	private direction = new Vector3();
 	private moveForward = false;
 	private moveBackward = false;
 	private moveLeft = false;
@@ -16,7 +15,7 @@ export class Player {
 
 	private prevTime: number;
 
-	constructor(camera: THREE.Camera, domElement: HTMLElement) {
+	constructor(camera: Camera, domElement: HTMLElement) {
 		this.controls = new PointerLockControls(camera, domElement);
 		this.prevTime = performance.now();
 

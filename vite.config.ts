@@ -1,6 +1,9 @@
+import { threeMinifier } from "@yushijinhun/three-minifier-rollup";
 import { defineConfig } from "vite";
 
 export default defineConfig({
+	base: "./",
+	publicDir: "public",
 	server: {
 		// 開発サーバーのヘッダー設定 (SharedArrayBufferなどに必要になる場合がある)
 		headers: {
@@ -11,5 +14,16 @@ export default defineConfig({
 	optimizeDeps: {
 		// COOP/COEP設定時に必要
 		exclude: ["@js-joda/core"],
+	},
+	plugins: [{ ...threeMinifier(), enforce: "pre" }],
+	build: {
+		copyPublicDir: false,
+		rollupOptions: {
+			output: {
+				manualChunks: {
+					three: ["three"],
+				},
+			},
+		},
 	},
 });

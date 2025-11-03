@@ -1,3 +1,6 @@
+[core]
+    ignorecase = false
+
 [merge "theirs"]
-    name = Always use theirs version
-    driver = true
+    name = always take the other branch
+    driver = sh -c "cat \"$1\" > \"$2\"" -- %B %A

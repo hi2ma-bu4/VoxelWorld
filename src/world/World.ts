@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import { BoxGeometry, BufferAttribute, BufferGeometry, FrontSide, Mesh, MeshBasicMaterial, MeshStandardMaterial, NearestFilter, Raycaster, Texture, Vector2, Vector3 } from "three";
 import { BLOCK_AIR, BLOCK_STONE, CHUNK_SIZE_X, CHUNK_SIZE_Y, CHUNK_SIZE_Z, type WorkerRequestMessage, type WorkerResponseMessage } from "../common/types";
 import type { Player } from "../rendering/Player";
 import type { Renderer } from "../rendering/Renderer";
@@ -13,47 +13,47 @@ export class World {
 	private player: Player;
 	private worker: Worker;
 
-	private chunks = new Map<string, THREE.Mesh>();
+	private chunks = new Map<string, Mesh>();
 	private requestedChunks = new Set<string>();
 
 	// --- フェーズ2 追加 ---
-	private texture: THREE.Texture;
-	private chunkMaterial: THREE.MeshStandardMaterial;
-	private raycaster = new THREE.Raycaster();
-	private selectionBox: THREE.Mesh; // ブロック選択ハイライト
+	private texture: Texture;
+	private chunkMaterial: MeshStandardMaterial;
+	private raycaster = new Raycaster();
+	private selectionBox: Mesh; // ブロック選択ハイライト
 
 	// 現在選択中のブロック (破壊/設置用)
 	public selectedBlock = {
-		position: new THREE.Vector3(), // 破壊対象のブロックのワールド座標
-		normal: new THREE.Vector3(), // 破壊対象のブロックの面
+		position: new Vector3(), // 破壊対象のブロックのワールド座標
+		normal: new Vector3(), // 破壊対象のブロックの面
 		exists: false,
 	};
 	// ---
 
-	constructor(renderer: Renderer, player: Player, texture: THREE.Texture) {
+	constructor(renderer: Renderer, player: Player, texture: Texture) {
 		this.renderer = renderer;
 		this.player = player;
 		this.texture = texture;
 
 		// テクスチャ設定
-		this.texture.magFilter = THREE.NearestFilter; // ピクセル感を出す
-		this.texture.minFilter = THREE.NearestFilter;
+		this.texture.magFilter = NearestFilter; // ピクセル感を出す
+		this.texture.minFilter = NearestFilter;
 
 		// マテリアル (テクスチャ使用)
-		this.chunkMaterial = new THREE.MeshStandardMaterial({
+		this.chunkMaterial = new MeshStandardMaterial({
 			map: this.texture,
-			side: THREE.FrontSide,
+			side: FrontSide,
 		});
 
 		// ブロック選択ハイライト用のメッシュ
-		const selectionGeom = new THREE.BoxGeometry(1.001, 1.001, 1.001); // 1.001にしてカリングを防ぐ
-		const selectionMat = new THREE.MeshBasicMaterial({
+		const selectionGeom = new BoxGeometry(1.001, 1.001, 1.001); // 1.001にしてカリングを防ぐ
+		const selectionMat = new MeshBasicMaterial({
 			color: 0xffffff,
 			wireframe: true,
 			transparent: true,
 			opacity: 0.5,
 		});
-		this.selectionBox = new THREE.Mesh(selectionGeom, selectionMat);
+		this.selectionBox = new Mesh(selectionGeom, selectionMat);
 		this.selectionBox.visible = false;
 		this.renderer.scene.add(this.selectionBox);
 
@@ -86,18 +86,18 @@ export class World {
 		}
 
 		// ジオメトリ作成
-		const geometry = new THREE.BufferGeometry();
-		geometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array(meshData.positions), 3));
-		geometry.setAttribute("normal", new THREE.BufferAttribute(new Float32Array(meshData.normals), 3));
+		const geometry = new BufferGeometry();
+		geometry.setAttribute("position", new BufferAttribute(new Float32Array(meshData.positions), 3));
+		geometry.setAttribute("normal", new BufferAttribute(new Float32Array(meshData.normals), 3));
 		geometry.setAttribute(
 			// UVs追加
 			"uv",
-			new THREE.BufferAttribute(new Float32Array(meshData.uvs), 2)
+			new BufferAttribute(new Float32Array(meshData.uvs), 2)
 		);
-		geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(meshData.indices), 1));
+		geometry.setIndex(new BufferAttribute(new Uint32Array(meshData.indices), 1));
 
 		// メッシュ作成
-		const mesh = new THREE.Mesh(geometry, this.chunkMaterial);
+		const mesh = new Mesh(geometry, this.chunkMaterial);
 		const [cx, cy, cz] = chunkKey.split(",").map(Number);
 		mesh.position.set(cx * CHUNK_SIZE_X, cy * CHUNK_SIZE_Y, cz * CHUNK_SIZE_Z);
 
@@ -161,7 +161,7 @@ export class World {
 		}
 
 		// カメラ（視点）からレイを飛ばす
-		this.raycaster.setFromCamera(new THREE.Vector2(0, 0), this.renderer.camera); // 画面中央
+		this.raycaster.setFromCamera(new Vector2(0, 0), this.renderer.camera); // 画面中央
 		const intersects = this.raycaster.intersectObjects(Array.from(this.chunks.values()), false);
 
 		if (intersects.length > 0) {
@@ -172,7 +172,7 @@ export class World {
 			const normal = intersection.face!.normal;
 
 			// ブロックの中心にスナップさせる (法線方向に0.5ずらす)
-			const blockPos = new THREE.Vector3(Math.floor(pos.x - normal.x * 0.5), Math.floor(pos.y - normal.y * 0.5), Math.floor(pos.z - normal.z * 0.5));
+			const blockPos = new Vector3(Math.floor(pos.x - normal.x * 0.5), Math.floor(pos.y - normal.y * 0.5), Math.floor(pos.z - normal.z * 0.5));
 
 			// ハイライト用のボックスを更新
 			this.selectionBox.position.set(blockPos.x + 0.5, blockPos.y + 0.5, blockPos.z + 0.5);

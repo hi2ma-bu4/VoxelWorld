@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import { TextureLoader } from "three";
 import { Player } from "./rendering/Player";
 import { Renderer } from "./rendering/Renderer";
 import { World } from "./world/World";
@@ -14,8 +14,8 @@ async function main() {
 	const player = new Player(renderer.camera, canvas);
 
 	// 3. テクスチャの読み込み (非同期)
-	const textureLoader = new THREE.TextureLoader();
-	const texture = await textureLoader.loadAsync("/textures.png");
+	const textureLoader = new TextureLoader();
+	const texture = await textureLoader.loadAsync("../public/assets/img/textures.png");
 	console.log("Main: テクスチャ読み込み完了");
 
 	// 4. ワールドを初期化 (Worker起動、DB読み込み開始)

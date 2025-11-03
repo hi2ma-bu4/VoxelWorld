@@ -1,21 +1,21 @@
-import * as THREE from "three";
+import { AmbientLight, Color, DirectionalLight, PerspectiveCamera, Scene, WebGLRenderer } from "three";
 import { Player } from "./Player";
 
 export class Renderer {
-	public scene: THREE.Scene;
-	public camera: THREE.PerspectiveCamera;
-	private renderer: THREE.WebGLRenderer;
+	public scene: Scene;
+	public camera: PerspectiveCamera;
+	private renderer: WebGLRenderer;
 	private canvas: HTMLCanvasElement;
 
 	constructor(canvas: HTMLCanvasElement) {
 		this.canvas = canvas;
 
 		// 1. シーン
-		this.scene = new THREE.Scene();
-		this.scene.background = new THREE.Color(0x87ceeb); // 空の色
+		this.scene = new Scene();
+		this.scene.background = new Color(0x87ceeb); // 空の色
 
 		// 2. カメラ
-		this.camera = new THREE.PerspectiveCamera(
+		this.camera = new PerspectiveCamera(
 			75, // 視野角
 			window.innerWidth / window.innerHeight, // アスペクト比
 			0.1, // ニアクリップ
@@ -23,7 +23,7 @@ export class Renderer {
 		);
 
 		// 3. レンダラー
-		this.renderer = new THREE.WebGLRenderer({
+		this.renderer = new WebGLRenderer({
 			canvas: this.canvas,
 			antialias: true, // アンチエイリアス
 		});
@@ -31,10 +31,10 @@ export class Renderer {
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 
 		// 4. ライティング
-		const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+		const ambientLight = new AmbientLight(0xffffff, 0.6);
 		this.scene.add(ambientLight);
 
-		const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+		const directionalLight = new DirectionalLight(0xffffff, 1.0);
 		directionalLight.position.set(50, 100, 50); // 太陽の位置
 		directionalLight.target.position.set(0, 0, 0);
 		this.scene.add(directionalLight);
