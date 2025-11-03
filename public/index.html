@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Voxel World</title>
+	<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+	<canvas id="main-canvas"></canvas>
+
+	<div id="ui-container">
+		<div id="reticle">+</div>
+		<div id="instructions">
+			クリックして操作開始 (W, A, S, Dキーで移動)<br />
+			左クリック: 破壊 / 右クリック: 設置
+		</div>
+		<div id="loading-screen">
+			<div class="spinner"></div>
+			<p>ワールドを読み込み中...</p>
+		</div>
+		<button id="save-button">ワールドを保存</button>
+	</div>
+
+	<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

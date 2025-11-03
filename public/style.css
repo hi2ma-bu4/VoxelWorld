@@ -1,0 +1,117 @@
+body {
+    background-color: #333;
+    color: white;
+    font-family: sans-serif;
+    margin: 0;
+    overflow: hidden;
+}
+
+#main-canvas {
+    background-color: #87ceeb;
+    height: 100%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+#ui-container {
+    height: 100%;
+    left: 0;
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+#reticle {
+    color: rgba(255, 255, 255, .7);
+    font-size: 24px;
+    left: 50%;
+    position: fixed;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#instructions {
+    background: rgba(0, 0, 0, .5);
+    border-radius: 5px;
+    left: 50%;
+    padding: 10px 20px;
+    position: fixed;
+    text-align: center;
+    top: 50%;
+    transform: translate(-50%, -100px);
+}
+
+/* --- PointerLock (操作中) のスタイル --- */
+body.locked #instructions {
+    display: none;
+}
+
+body:not(.locked) #reticle {
+    display: none;
+}
+
+body:not(.locked) #instructions {
+    display: block;
+}
+
+/* --- ローディング画面 --- */
+#loading-screen {
+    align-items: center;
+    background: rgba(0, 0, 0, .8);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    position: fixed;
+    top: 0;
+    transition: opacity .5s;
+    width: 100%;
+    z-index: 100;
+}
+
+#loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+    border: 8px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 8px solid #3498db;
+    height: 60px;
+    width: 60px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* --- セーブボタン --- */
+#save-button {
+    background: #4caf50;
+    border: none;
+    border-radius: 5px;
+    bottom: 20px;
+    color: white;
+    cursor: pointer;
+    left: 20px;
+    padding: 10px 20px;
+    pointer-events: all;
+    position: fixed;
+    z-index: 50;
+}
+
+#save-button:hover {
+    background: #45a049;
+}
