@@ -12,14 +12,19 @@ pub struct MeshData {
 const ATLAS_SIZE: f32 = 16.0;
 const TILE_SIZE: f32 = 1.0 / ATLAS_SIZE;
 
-// ブロックID -> テクスチャ座標 (X, Y)
-fn get_texture_coords(block_id: u8) -> (f32, f32) {
+// ブロックIDと面の向き -> テクスチャ座標 (X, Y)
+fn get_texture_coords(block_id: u8, face_index: usize) -> (f32, f32) {
     match block_id {
-        BLOCK_GRASS => (0.0, 0.0), // アトラスの (0, 0)
-        BLOCK_DIRT => (2.0, 0.0),  // アトラスの (2, 0)
-        BLOCK_STONE => (1.0, 0.0), // アトラスの (1, 0)
-        // 他のブロック...
-        _ => (1.0, 1.0), // デフォルト (例: 紫のテクスチャ)
+        BLOCK_GRASS => {
+            match face_index {
+                2 => (0.0, 0.0), // 上面 (Y+)
+                3 => (2.0, 0.0), // 下面 (Y-)
+                _ => (3.0, 0.0), // 側面
+            }
+        }
+        BLOCK_DIRT => (2.0, 0.0),
+        BLOCK_STONE => (1.0, 0.0),
+        _ => (1.0, 1.0), // デフォルト
     }
 }
 
@@ -84,6 +89,7 @@ const FACE_UVS: [[f32; 2]; 4] = [[0.0, 0.0], [0.0, 1.0], [1.0, 1.0], [1.0, 0.0]]
 
 // 面を構成する2つの三角形 (インデックス)
 const FACE_INDICES: [u32; 6] = [0, 1, 2, 0, 2, 3];
+const TOP_FACE_INDICES: [u32; 6] = [0, 2, 1, 0, 3, 2]; // Y+面だけ逆回り
 
 // チャンクデータからメッシュを生成
 pub fn generate_mesh(chunk_data: &[u8]) -> MeshData {
@@ -103,13 +109,10 @@ pub fn generate_mesh(chunk_data: &[u8]) -> MeshData {
                     continue; // 空気のブロック
                 }
 
-                // ブロックIDからUVオフセットを取得
-                let (uv_x_offset, uv_y_offset) = get_texture_coords(block_id);
-                let uv_base_x = uv_x_offset * TILE_SIZE;
-                let uv_base_y = uv_y_offset * TILE_SIZE;
-
                 // 6方向 (隣接ブロック) をチェック
                 for face_index in 0..6 {
+                    // --- この面を描画するかどうかを決定 ---
+                    let normal = FACE_NORMALS[face_index];
                     let normal = FACE_NORMALS[face_index];
 
                     let neighbor_x = x as i32 + normal[0] as i32;
@@ -135,6 +138,11 @@ pub fn generate_mesh(chunk_data: &[u8]) -> MeshData {
 
                     // 隣が固体ブロックでなければ、この面を描画
                     if !is_block_solid(neighbor_block_id) {
+                        // --- 描画が決まったら、この面のUVを計算 ---
+                        let (uv_x_offset, uv_y_offset) = get_texture_coords(block_id, face_index);
+                        let uv_base_x = uv_x_offset * TILE_SIZE;
+                        let uv_base_y = uv_y_offset * TILE_SIZE;
+
                         // この面の4頂点を追加
                         let vertices = FACE_VERTICES[face_index];
                         for i in 0..4 {
@@ -157,7 +165,13 @@ pub fn generate_mesh(chunk_data: &[u8]) -> MeshData {
                         }
 
                         // インデックスを追加
-                        for &idx in &FACE_INDICES {
+                        let indices_to_add = if face_index == 2 {
+                            // 上面 (Y+)
+                            &TOP_FACE_INDICES
+                        } else {
+                            &FACE_INDICES
+                        };
+                        for &idx in indices_to_add {
                             indices.push(current_index + idx);
                         }
                         current_index += 4;

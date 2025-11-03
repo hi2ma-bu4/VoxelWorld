@@ -1,4 +1,9 @@
 import { AmbientLight, Color, DirectionalLight, PerspectiveCamera, Scene, WebGLRenderer } from "three";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
+import { FXAAShader } from "three/examples/jsm/shaders/FXAAShader.js";
+import Stats from "stats.js";
 import { Player } from "./Player";
 
 export class Renderer {
@@ -6,6 +11,9 @@ export class Renderer {
 	public camera: PerspectiveCamera;
 	private renderer: WebGLRenderer;
 	private canvas: HTMLCanvasElement;
+	private composer: EffectComposer;
+	private fxaaPass: ShaderPass;
+	private stats: Stats;
 
 	constructor(canvas: HTMLCanvasElement) {
 		this.canvas = canvas;
@@ -25,12 +33,22 @@ export class Renderer {
 		// 3. レンダラー
 		this.renderer = new WebGLRenderer({
 			canvas: this.canvas,
-			antialias: true, // アンチエイリアス
+			antialias: false,
 		});
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 
-		// 4. ライティング
+		// 4. ポストプロセシング (アンチエイリアス)
+		this.composer = new EffectComposer(this.renderer);
+		const renderPass = new RenderPass(this.scene, this.camera);
+		this.composer.addPass(renderPass);
+
+		this.fxaaPass = new ShaderPass(FXAAShader);
+		this.fxaaPass.material.uniforms["resolution"].value.x = 1 / (window.innerWidth * window.devicePixelRatio);
+		this.fxaaPass.material.uniforms["resolution"].value.y = 1 / (window.innerHeight * window.devicePixelRatio);
+		this.composer.addPass(this.fxaaPass);
+
+		// 5. ライティング
 		const ambientLight = new AmbientLight(0xffffff, 0.6);
 		this.scene.add(ambientLight);
 
@@ -41,17 +59,28 @@ export class Renderer {
 
 		// 5. リサイズ対応
 		window.addEventListener("resize", () => this.onResize());
+
+		// 6. FPS表示
+		this.stats = new Stats();
+		this.stats.dom.style.position = "absolute";
+		this.stats.dom.style.top = "0px";
+		this.stats.dom.style.left = "0px";
+		document.body.appendChild(this.stats.dom);
 	}
 
 	private onResize() {
 		this.camera.aspect = window.innerWidth / window.innerHeight;
 		this.camera.updateProjectionMatrix();
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
+		this.composer.setSize(window.innerWidth, window.innerHeight);
+		this.fxaaPass.material.uniforms["resolution"].value.x = 1 / (window.innerWidth * window.devicePixelRatio);
+		this.fxaaPass.material.uniforms["resolution"].value.y = 1 / (window.innerHeight * window.devicePixelRatio);
 	}
 
 	// レンダリング実行
 	render(player: Player) {
 		player.update(); // プレイヤーの移動を更新
-		this.renderer.render(this.scene, this.camera);
+		this.composer.render();
+		this.stats.update();
 	}
 }
