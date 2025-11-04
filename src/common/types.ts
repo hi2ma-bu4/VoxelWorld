@@ -29,7 +29,7 @@ export function index_to_xyz(index: number): [number, number, number] {
 export interface GeneratedMesh {
 	positions: ArrayBuffer;
 	normals: ArrayBuffer;
-	uvs: ArrayBuffer; // UV追加
+	uvs: ArrayBuffer;
 	indices: ArrayBuffer;
 }
 

@@ -36,13 +36,13 @@ impl WorldGenerator {
 
         let positions = js_sys::Float32Array::from(mesh_data.positions.as_slice());
         let normals = js_sys::Float32Array::from(mesh_data.normals.as_slice());
-        let uvs = js_sys::Float32Array::from(mesh_data.uvs.as_slice()); // UVs追加
+        let uvs = js_sys::Float32Array::from(mesh_data.uvs.as_slice());
         let indices = js_sys::Uint32Array::from(mesh_data.indices.as_slice());
 
         let obj = js_sys::Object::new();
         js_sys::Reflect::set(&obj, &"positions".into(), &positions.buffer()).unwrap();
         js_sys::Reflect::set(&obj, &"normals".into(), &normals.buffer()).unwrap();
-        js_sys::Reflect::set(&obj, &"uvs".into(), &uvs.buffer()).unwrap(); // UVs追加
+        js_sys::Reflect::set(&obj, &"uvs".into(), &uvs.buffer()).unwrap();
         js_sys::Reflect::set(&obj, &"indices".into(), &indices.buffer()).unwrap();
 
         obj.into()
